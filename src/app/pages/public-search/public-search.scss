@@ -1,0 +1,70 @@
+/* DEFINICIÓN DE COLORES TSE Bolivia */
+$tse-yellow: #FFD100; // Amarillo Oro SERECI
+$tse-yellow-hover: #FBBF24; // yellow-400 para hover
+$tse-yellow-dark: #A16207; // yellow-800 para texto en fondo amarillo claro
+
+:host ::ng-drop-view {
+
+    /* Progress Bar Amarilla TSE */
+    .tse-progress-bar {
+        .p-progressbar-value {
+            background: $tse-yellow;
+        }
+    }
+
+    /* Botón Principal Amarillo tse */
+    .tse-btn-primary {
+        background: $tse-yellow !important;
+        color: #000 !important; // Texto negro para contraste
+        border: none !important;
+
+        &:hover {
+            background: $tse-yellow-hover !important;
+            transform: translateY(-2px); // Pequeño efecto UX de hover
+        }
+
+        &:focus {
+            box-shadow: 0 0 0 0.2rem rgba(255, 209, 0, 0.5) !important;
+        }
+
+        .p-button-loading-icon {
+            color: #000 !important;
+        }
+    }
+
+    /* Input Focus Amarillo tse */
+    .p-inputtext:focus {
+        border-color: $tse-yellow !important;
+        box-shadow: 0 0 0 0.2rem rgba(255, 209, 0, 0.25) !important;
+    }
+
+    /* Elementos visuales Amarillo tse */
+    .tse-text-yellow {
+        color: $tse-yellow !important;
+    }
+
+    .tse-bg-yellow {
+        background: $tse-yellow !important;
+    }
+
+    /* Marcos de foto y bloques con identidad visual */
+    .tse-photo-frame {
+        border-color: var(--surface-200) !important;
+        // box-shadow: 0 10px 30px -10px rgba(255, 209, 0, 0.3); // Glow sutil amarillo
+    }
+
+    .tse-text-yellow-dark {
+        color: $tse-yellow-dark;
+    }
+
+    /* Bloque geografía con fondo amarillo claro (compatible modo oscuro) */
+    .tse-geography-block {
+        background: #FFFBEB; // yellow-50
+        border-color: #FDE68A; // yellow-200
+
+        :host-context(.dark) & {
+            background: rgba(251, 191, 36, 0.05); // yellow-400 con opacidad muy baja
+            border-color: rgba(251, 191, 36, 0.1);
+        }
+    }
+}

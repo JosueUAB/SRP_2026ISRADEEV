@@ -1,0 +1,223 @@
+<p-toast position="top-center"></p-toast>
+
+<div *ngIf="buscando" class="fixed top-0 left-0 w-full z-100">
+    <p-progressBar mode="indeterminate" [style]="{'height': '4px', 'background': 'var(--surface-50)'}"
+        styleClass="tse-progress-bar"></p-progressBar>
+</div>
+
+<div
+    class="min-h-screen bg-surface-50 dark:bg-surface-950 flex flex-col items-center justify-center p-4 relative transition-colors duration-300">
+
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-yellow-400/5 blur-[120px]"></div>
+        <div class="absolute top-[60%] -right-[10%] w-[40%] h-[40%] rounded-full bg-surface-400/5 blur-[100px]"></div>
+    </div>
+
+    <app-floating-configurator />
+
+    <a routerLink="/login" pTooltip="Ingreso solo para Coordinadores autorizados" tooltipPosition="right"
+        class="absolute top-6 left-6 text-surface-600 dark:text-surface-300 hover:text-yellow-600 font-bold p-3 bg-white/80 dark:bg-surface-900/80 rounded-full shadow-lg transition-all z-50 flex items-center gap-2 text-sm border border-surface-200 dark:border-surface-700 backdrop-blur-md">
+        <i class="pi pi-lock"></i> <span class="hidden sm:inline">Administración</span>
+    </a>
+
+    <div *ngIf="vistaActual === 'buscador'"
+        class="w-full max-w-lg bg-white/90 dark:bg-surface-900/90 backdrop-blur-xl p-8 sm:p-10 rounded-[2rem] shadow-2xl border border-surface-200 dark:border-surface-800 flex flex-col items-center z-10 animate-fadein relative overflow-hidden">
+
+        <div class="absolute top-0 left-0 w-full flex h-1.5 opacity-80">
+            <div class="w-1/3 bg-red-600"></div>
+            <div class="w-1/3 bg-yellow-400"></div>
+            <div class="w-1/3 bg-green-600"></div>
+        </div>
+
+        <div class="text-center mb-10 mt-2 relative z-10">
+            <div
+                class="mx-auto mb-6 border-4 border-yellow-400/40 p-3 pt-4 inline-block rounded-[1.5rem] bg-white dark:bg-surface-800 shadow-md">
+                <h2 class="text-3xl sm:text-4xl font-black text-yellow-500 tracking-tighter leading-none"
+                    style="font-family: 'Verdana', sans-serif;">SERECÍ</h2>
+                <p
+                    class="text-[10px] font-bold text-surface-500 dark:text-surface-400 uppercase tracking-[.3em] mt-1 -mr-[.3em]">
+                    Oruro</p>
+            </div>
+            <h1
+                class="text-xl sm:text-2xl font-black text-surface-900 dark:text-surface-0 mb-2 uppercase tracking-tight">
+                Verificación Credencial</h1>
+            <p class="text-surface-500 dark:text-surface-400 font-medium text-sm">Empadronamiento Masivo • OEP Bolivia
+            </p>
+        </div>
+
+        <div class="w-full flex flex-col gap-4 relative z-10">
+            <span class="p-input-icon-left w-full group relative">
+                <i class="pi pi-id-card text-surface-400 group-focus-within:text-yellow-500 transition-colors text-xl z-10"></i>
+                <input id="cedula" type="text" pInputText placeholder="Ingrese Cédula" [(ngModel)]="searchQuery"
+                    (keyup.enter)="buscar(searchQuery)"
+                    class="w-full p-4 bg-surface-50 dark:bg-surface-950 border-surface-200 dark:border-surface-700 text-lg font-bold rounded-2xl focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all shadow-inner" />
+
+                <div *ngIf="loading" class="absolute right-4 top-1/2 -translate-y-1/2 z-10 flex items-center">
+                    <p-progressSpinner styleClass="w-2rem h-2rem" strokeWidth="6" fill="transparent"
+                        animationDuration=".5s"></p-progressSpinner>
+                </div>
+            </span>
+
+            <button pButton label="Consultar Credencial" icon="pi pi-search"
+                pTooltip="Buscar credencial en la base de datos oficial" tooltipPosition="bottom"
+                class="w-full p-4 text-base sm:text-lg font-bold rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all border-none bg-yellow-400 hover:bg-yellow-500 text-yellow-950"
+                (click)="buscar(searchQuery)" [loading]="loading"></button>
+        </div>
+    </div>
+
+
+    <div *ngIf="vistaActual === 'credencial' && resultado"
+        class="w-full max-w-[850px] z-10 animate-fadein relative my-8">
+
+        <button pButton icon="pi pi-arrow-left" label="Nueva Consulta"
+            class="mb-6 p-button-text text-surface-700 dark:text-surface-200 font-bold bg-white/70 dark:bg-surface-900/70 hover:bg-white dark:hover:bg-surface-800 rounded-full px-5 py-2 transition-all shadow-sm backdrop-blur-md"
+            (click)="nuevaConsulta()"></button>
+
+        <div
+            class="bg-white/95 dark:bg-surface-900/95 backdrop-blur-xl rounded-[2.5rem] shadow-2xl overflow-hidden border border-surface-200/50 dark:border-surface-700/50 relative">
+
+            <div class="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
+                <h1 class="text-[8rem] sm:text-[14rem] font-black transform -rotate-12">SERECÍ</h1>
+            </div>
+
+            <div class="flex flex-col md:flex-row relative z-10">
+
+                <div
+                    class="md:w-2/5 lg:w-1/3 p-8 flex flex-col items-center border-b md:border-b-0 md:border-r border-surface-100 dark:border-surface-800 relative bg-surface-50/50 dark:bg-surface-950/50">
+
+                    <div
+                        class="absolute top-0 left-0 w-full md:w-1.5 md:h-full h-1.5 flex flex-row md:flex-col opacity-80 z-20">
+                        <div class="flex-1 bg-red-600"></div>
+                        <div class="flex-1 bg-yellow-400"></div>
+                        <div class="flex-1 bg-green-600"></div>
+                    </div>
+
+                    <div class="w-40 h-40 sm:w-48 sm:h-48 rounded-[2rem] shadow-xl overflow-hidden bg-surface-100 dark:bg-surface-800 flex items-center justify-center mb-6 relative transition-all duration-500 border-4"
+                        [ngClass]="{'border-green-500 shadow-[0_0_25px_rgba(34,197,94,0.4)]': (resultado.estado === 'activo' || resultado.estado === 'ACTIVO'), 'border-surface-200 dark:border-surface-700': (resultado.estado !== 'activo' && resultado.estado !== 'ACTIVO')}">
+                        <img *ngIf="resultado.foto_url" [src]="resultado.foto_url | safeUrl" alt="Foto Oficial"
+                            class="w-full h-full object-cover" />
+                        <i *ngIf="!resultado.foto_url"
+                            class="pi pi-user text-7xl text-surface-300 dark:text-surface-600"></i>
+
+                        <div *ngIf="(resultado.estado === 'activo' || resultado.estado === 'ACTIVO')"
+                            class="absolute top-2 right-2 bg-green-500 text-white rounded-full p-1 shadow-md">
+                            <i class="pi pi-verified text-sm"></i>
+                        </div>
+                    </div>
+
+                    <div
+                        class="bg-gradient-to-br from-yellow-300 to-yellow-500 p-3 rounded-2xl text-center w-full shadow-lg mb-6 transform hover:scale-105 transition-transform">
+                        <p
+                            class="text-[10px] sm:text-xs text-yellow-950 font-black uppercase tracking-widest leading-none mb-1">
+                            C.I.</p>
+                        <p class="text-xl sm:text-2xl font-black text-yellow-950 font-mono tracking-tighter">{{
+                            resultado.cedula }}</p>
+                    </div>
+
+                    <div class="w-full text-center mt-auto">
+                        <div *ngIf="(resultado.estado === 'Activo' || resultado.estado === 'ACTIVO')"
+                            class="w-full bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400 px-5 py-3 text-sm font-black uppercase rounded-2xl flex items-center justify-center gap-2 border border-green-200 dark:border-green-800/50">
+                            <span class="relative flex h-3 w-3">
+                                <span
+                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                            </span>
+                            ACTIVO
+                        </div>
+                        <div *ngIf="!(resultado.estado === 'activo' || resultado.estado === 'ACTIVO')"
+                            class="w-full bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400 px-5 py-3 text-sm font-black uppercase rounded-2xl flex items-center justify-center gap-2 border border-red-200 dark:border-red-800/50">
+                            <i class="pi pi-times-circle text-lg"></i> {{resultado.estado}}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="md:w-3/5 lg:w-2/3 p-6 sm:p-10 flex flex-col">
+
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <p
+                                class="text-[10px] sm:text-xs uppercase tracking-[0.2em] text-surface-500 dark:text-surface-400 font-bold mb-1">
+                                Órgano Electoral Plurinacional</p>
+                            <h2
+                                class="text-xl sm:text-2xl font-black text-yellow-600 dark:text-yellow-500 tracking-tight leading-none">
+                                SERECI ORURO</h2>
+                        </div>
+                        <div
+                            class="w-10 h-10 rounded-full border border-surface-200 dark:border-surface-700 flex items-center justify-center text-surface-300 dark:text-surface-600">
+                            <i class="pi pi-verified"></i>
+                        </div>
+                    </div>
+
+                    <div class="mb-8">
+                        <span
+                            class="inline-block px-4 py-1.5 rounded-full text-sm sm:text-base font-black uppercase tracking-wider bg-surface-100 dark:bg-surface-800 text-surface-800 dark:text-surface-200 border border-surface-200 dark:border-surface-700 shadow-sm">
+                            {{ resultado.cargo || resultado.categoria }}
+                        </span>
+                    </div>
+
+                    <div class="mb-8 pl-4 border-l-4 border-yellow-400">
+                        <p
+                            class="text-[10px] sm:text-xs text-surface-500 dark:text-surface-400 font-bold uppercase tracking-widest mb-1.5">
+                            Nombres y Apellidos</p>
+                        <h2
+                            class="text-2xl sm:text-4xl font-black text-surface-900 dark:text-surface-0 uppercase leading-[1.1]">
+                            {{ resultado.nombres }} <br> <span class="text-surface-700 dark:text-surface-300">{{
+                                resultado.apellidos }}</span></h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-auto opacity-90">
+
+                        <div *ngIf="resultado.brigada"
+                            class="bg-surface-50 dark:bg-surface-950 p-4 rounded-2xl border border-surface-100 dark:border-surface-800/60 shadow-sm">
+                            <p
+                                class="text-[10px] sm:text-xs text-surface-500 dark:text-surface-400 font-bold uppercase flex items-center gap-1.5 mb-1">
+                                <i class="pi pi-users text-yellow-600 text-[10px]"></i> Brigada</p>
+                            <p
+                                class="text-sm sm:text-base font-black text-surface-900 dark:text-surface-0 uppercase leading-tight">
+                                {{ resultado.brigada }}</p>
+                            <p
+                                class="text-[10px] font-bold text-surface-500 dark:text-surface-500 uppercase mt-1 bg-surface-200/50 dark:bg-surface-800/50 inline-block px-2 py-0.5 rounded">
+                                Tipo: {{ resultado.tipo_operador || 'URBANO' }}</p>
+                        </div>
+
+                        <div *ngIf="resultado.recinto"
+                            class="bg-surface-50 dark:bg-surface-950 p-4 rounded-2xl border border-surface-100 dark:border-surface-800/60 shadow-sm">
+                            <p
+                                class="text-[10px] sm:text-xs text-surface-500 dark:text-surface-400 font-bold uppercase flex items-center gap-1.5 mb-1">
+                                <i class="pi pi-building text-yellow-600 text-[10px]"></i> Recinto</p>
+                            <p
+                                class="text-sm font-bold text-surface-900 dark:text-surface-0 uppercase leading-tight line-clamp-3">
+                                {{ resultado.recinto }}</p>
+                        </div>
+
+                        <div
+                            class="sm:col-span-2 bg-gradient-to-r from-surface-100 to-surface-50 dark:from-surface-800 dark:to-surface-900 p-5 rounded-2xl border border-surface-200/50 dark:border-surface-700/50 shadow-sm relative overflow-hidden group">
+                            <i
+                                class="pi pi-map-marker absolute -right-6 -bottom-6 text-8xl text-surface-200 dark:text-surface-700 opacity-30 group-hover:scale-110 transition-transform duration-500"></i>
+
+                            <div class="relative z-10">
+                                <p
+                                    class="text-[10px] sm:text-xs text-surface-600 dark:text-surface-400 uppercase font-black tracking-wider flex items-center gap-1.5 mb-2">
+                                    <i class="pi pi-map"></i> Asignación Geográfica</p>
+                                <p
+                                    class="text-sm sm:text-base font-semibold text-surface-700 dark:text-surface-300 uppercase mb-0.5">
+                                    {{ resultado.municipio || '-' }}, {{ resultado.provincia || '-' }}</p>
+                                <p
+                                    class="text-xl sm:text-2xl font-black text-surface-900 dark:text-surface-50 uppercase leading-none">
+                                    {{ resultado.localidad || '-' }}</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class="w-full bg-surface-100 dark:bg-surface-950 py-3 text-center border-t border-surface-200 dark:border-surface-800">
+                <p
+                    class="text-[8px] sm:text-[9px] text-surface-500 dark:text-surface-600 font-bold uppercase tracking-[.2em] -mr-[.2em]">
+                    Validación Biométrica Oficial • Padrón Electoral Biométrico • Bolivia</p>
+            </div>
+        </div>
+    </div>
+</div>

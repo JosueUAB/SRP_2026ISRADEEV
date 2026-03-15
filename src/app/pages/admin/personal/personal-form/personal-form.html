@@ -1,0 +1,111 @@
+<div class="grid grid-cols-12 gap-4">
+
+    <div class="col-span-12">
+        <h3 class="text-lg font-bold border-b border-surface-200 dark:border-surface-700 pb-2 mb-2 text-primary">1. Datos Personales</h3>
+    </div>
+
+    <div class="col-span-12 md:col-span-4 field">
+        <label for="cedula" class="font-bold">Cédula <span class="text-red-500">*</span></label>
+        <input type="text" pInputText id="cedula" [(ngModel)]="personal.cedula" required autofocus placeholder="Ej. 1234567" />
+        <small class="text-red-500" *ngIf="!personal.cedula">Cédula es requerida.</small>
+    </div>
+
+    <div class="col-span-12 md:col-span-4 field">
+        <label for="nombres" class="font-bold">Nombres <span class="text-red-500">*</span></label>
+        <input type="text" pInputText id="nombres" [(ngModel)]="personal.nombres" required placeholder="Nombres del operador" />
+    </div>
+
+    <div class="col-span-12 md:col-span-4 field">
+        <label for="apellidos" class="font-bold">Apellidos <span class="text-red-500">*</span></label>
+        <input type="text" pInputText id="apellidos" [(ngModel)]="personal.apellidos" required placeholder="Apellidos del operador" />
+    </div>
+
+    <div class="col-span-12 mt-4">
+        <h3 class="text-lg font-bold border-b border-surface-200 dark:border-surface-700 pb-2 mb-2 text-primary">2. Asignación y Cargo</h3>
+    </div>
+
+    <div class="col-span-12 md:col-span-4 field">
+        <label for="coordinador" class="font-bold">Coordinador</label>
+        <input type="text" pInputText id="coordinador" [(ngModel)]="personal.coordinador" placeholder="Nombre del coordinador" />
+    </div>
+
+    <div class="col-span-12 md:col-span-4 field">
+        <label for="brigada" class="font-bold">Brigada</label>
+        <input type="text" pInputText id="brigada" [(ngModel)]="personal.brigada" placeholder="Ej. 19" />
+    </div>
+
+    <div class="col-span-12 md:col-span-4 field">
+        <label for="cargo" class="font-bold">Cargo</label>
+        <input type="text" pInputText id="cargo" [(ngModel)]="personal.cargo" placeholder="Ej. Operador de Transmisión" />
+    </div>
+
+    <div class="col-span-12 md:col-span-4 field">
+        <label for="categoria" class="font-bold">Categoría</label>
+        <p-select [options]="categorias" [(ngModel)]="personal.categoria" optionLabel="label" optionValue="value" placeholder="Seleccione Categoría" [appendTo]="'body'" styleClass="w-full"></p-select>
+    </div>
+
+    <div class="col-span-12 md:col-span-4 field">
+        <label for="tipo_operador" class="font-bold">Tipo Operador</label>
+        <p-select [options]="tiposOperador" [(ngModel)]="personal.tipo_operador" optionLabel="label" optionValue="value" placeholder="Seleccione Tipo" [appendTo]="'body'" styleClass="w-full"></p-select>
+    </div>
+
+    <div class="col-span-12 md:col-span-4 field">
+        <label for="estado" class="font-bold">Estado del Personal</label>
+        <p-select [options]="estados" [(ngModel)]="personal.estado" optionLabel="label" optionValue="value" [appendTo]="'body'" styleClass="w-full"></p-select>
+    </div>
+
+    <div class="col-span-12 mt-4">
+        <h3 class="text-lg font-bold border-b border-surface-200 dark:border-surface-700 pb-2 mb-2 text-primary">3. Ubicación Geográfica</h3>
+    </div>
+
+    <div class="col-span-12 md:col-span-4 field">
+        <label for="departamento" class="font-bold">Departamento</label>
+        <input type="text" pInputText id="departamento" [(ngModel)]="personal.departamento" placeholder="Ej. Oruro" />
+    </div>
+
+    <div class="col-span-12 md:col-span-4 field">
+        <label for="provincia" class="font-bold">Provincia</label>
+        <input type="text" pInputText id="provincia" [(ngModel)]="personal.provincia" placeholder="Ej. Litoral" />
+    </div>
+
+    <div class="col-span-12 md:col-span-4 field">
+        <label for="municipio" class="font-bold">Municipio</label>
+        <input type="text" pInputText id="municipio" [(ngModel)]="personal.municipio" placeholder="Ej. Cruz de Machacamarca" />
+    </div>
+
+    <div class="col-span-12 md:col-span-6 field">
+        <label for="localidad" class="font-bold">Localidad</label>
+        <input type="text" pInputText id="localidad" [(ngModel)]="personal.localidad" placeholder="Ej. Huayllas" />
+    </div>
+
+    <div class="col-span-12 md:col-span-6 field">
+        <label for="recinto" class="font-bold">Recinto Electoral</label>
+        <input type="text" pInputText id="recinto" [(ngModel)]="personal.recinto" placeholder="Ej. Casa Comunal" />
+    </div>
+
+    <div class="col-span-12 mt-4">
+        <h3 class="text-lg font-bold border-b border-surface-200 dark:border-surface-700 pb-2 mb-2 text-primary">4. Fotografía</h3>
+    </div>
+
+    <div class="col-span-12 field">
+        <div class="flex items-center gap-4">
+            <div class="w-24 h-24 rounded border border-surface-200 dark:border-surface-700 flex items-center justify-center overflow-hidden bg-surface-50 dark:bg-surface-800">
+                <img *ngIf="imagenPreview" [src]="imagenPreview" alt="Preview" class="w-full h-full object-cover"/>
+                <i *ngIf="!imagenPreview" class="pi pi-image text-3xl text-surface-400"></i>
+            </div>
+
+            <p-fileupload
+                mode="basic"
+                accept="image/*"
+                [maxFileSize]="5000000"
+                chooseLabel="Seleccionar Foto"
+                (onSelect)="onFileSelected($event)">
+            </p-fileupload>
+        </div>
+    </div>
+</div>
+
+<div class="flex justify-end gap-2 mt-6 pt-4 border-t border-surface-200 dark:border-surface-700">
+    <p-button label="Cancelar" icon="pi pi-times" [text]="true" (onClick)="cancelar()" [disabled]="loading"></p-button>
+    <p-button label="Guardar Registro" icon="pi pi-check" (onClick)="guardar()" [loading]="loading"></p-button>
+</div>
