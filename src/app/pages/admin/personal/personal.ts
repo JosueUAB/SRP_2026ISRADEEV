@@ -21,8 +21,8 @@ import { SafeUrlPipe } from '../../../core/pipes/safe-url.pipe';
   selector: 'app-personal',
   standalone: true,
   imports: [
-    CommonModule, FormsModule, TableModule, DialogModule, ButtonModule, 
-    InputTextModule, ToolbarModule, TagModule, SelectModule, IconFieldModule, 
+    CommonModule, FormsModule, TableModule, DialogModule, ButtonModule,
+    InputTextModule, ToolbarModule, TagModule, SelectModule, IconFieldModule,
     InputIconModule, FileUploadModule, TooltipModule, PersonalForm, SafeUrlPipe
   ],
   templateUrl: './personal.html',
@@ -34,14 +34,16 @@ export class Personal implements OnInit {
 
   personalList: any[] = [];
   loading: boolean = true;
-  globalFilterFields: string[] = ['nombres', 'apellidos', 'cedula', 'departamento', 'municipio', 'cargo', 'brigada', 'coordinador'];
+
+  // ¡El campo mágico "nombreCompleto" ahora es el principal motor de búsqueda!
+  globalFilterFields: string[] = ['nombreCompleto', 'cedula', 'departamento', 'municipio', 'cargo', 'brigada', 'coordinador'];
 
   personalDialog: boolean = false;
   detailsDialog: boolean = false;
   photoDialog: boolean = false;
-  
+
   selectedPersonal: any = null;
-  
+
   selectedPhotoFile: File | null = null;
   photoPreview: string | null = null;
   uploadingPhoto: boolean = false;
@@ -64,17 +66,24 @@ export class Personal implements OnInit {
         try { res = typeof resText === 'string' ? JSON.parse(resText) : resText; } catch(e) {}
 
         if (res && res.status === 'success') {
-          this.personalList = res.data || [];
-          
+          // Fusionamos Nombres y Apellidos aquí para el buscador y la tabla
+          this.personalList = (res.data || []).map((p: any) => ({
+            ...p,
+            nombreCompleto: `${p.nombres || ''} ${p.apellidos || ''}`.trim()
+          }));
+
           // Llenar opciones de filtros
           const coords = [...new Set(this.personalList.map(p => p.coordinador).filter(c => c))];
           this.coordinadoresOpciones = coords.map(c => ({ label: c, value: c }));
-          
+
           const brigadas = [...new Set(this.personalList.map(p => p.brigada).filter(b => b))];
           this.brigadasOpciones = brigadas.map(b => ({ label: b, value: b }));
 
         } else if (Array.isArray(res)) {
-          this.personalList = res;
+          this.personalList = res.map((p: any) => ({
+            ...p,
+            nombreCompleto: `${p.nombres || ''} ${p.apellidos || ''}`.trim()
+          }));
         } else {
           this.personalList = [];
         }
@@ -102,7 +111,7 @@ export class Personal implements OnInit {
     reader.onload = (e: any) => {
       const text = e.target.result;
       const data = this.csvToJson(text);
-      
+
       if (data.length > 0) {
         this.api.importarCSV(data).subscribe({
           next: (resText) => {
@@ -111,7 +120,7 @@ export class Personal implements OnInit {
            try { response = typeof resText === 'string' ? JSON.parse(resText) : resText; } catch(err) {}
            if(response.status === 'success'){
              Swal.fire('Éxito', response.mensaje, 'success');
-             this.fetchPersonal(); 
+             this.fetchPersonal();
            } else {
              Swal.fire('Error', response.mensaje || 'Error desconocido', 'error');
            }
@@ -129,7 +138,7 @@ export class Personal implements OnInit {
       }
     };
     reader.readAsText(file);
-    event.target.value = ''; 
+    event.target.value = '';
   }
 
   csvToJson(csv: string) {
@@ -139,13 +148,12 @@ export class Personal implements OnInit {
 
     for (let i = 1; i < lines.length; i++) {
       if (!lines[i].trim()) continue;
-      // Usamos regex para ignorar comas dentro de comillas
       const currentline = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
       let obj: any = {};
       for (let j = 0; j < headers.length; j++) {
         if(headers[j]) {
           let val = currentline[j] ? currentline[j].trim() : '';
-          val = val.replace(/^"|"$/g, ''); // Quita comillas si existen
+          val = val.replace(/^"|"$/g, '');
           obj[headers[j]] = val;
         }
       }
@@ -163,6 +171,8 @@ export class Personal implements OnInit {
           default: return 'info';
       }
   }
+
+
 
   openNew() {
     this.selectedPersonal = {};
@@ -210,7 +220,7 @@ export class Personal implements OnInit {
 
     this.uploadingPhoto = true;
     const base64Data = this.photoPreview.split(',')[1];
-    
+
     this.api.subirFoto(base64Data, this.selectedPersonal.cedula).subscribe({
       next: (resText) => {
         this.uploadingPhoto = false;
@@ -220,7 +230,7 @@ export class Personal implements OnInit {
         if (res && res.status === 'success') {
           Swal.fire('Éxito', 'Foto subida y actualizada correctamente', 'success');
           this.photoDialog = false;
-          this.fetchPersonal(); 
+          this.fetchPersonal();
         } else {
           Swal.fire('Error', 'No se pudo subir la foto', 'error');
         }
@@ -244,5 +254,13 @@ export class Personal implements OnInit {
   onSave(personalData: any) {
     this.personalDialog = false;
     this.fetchPersonal();
+  }
+// Método Bonus para colorear el Cargo dependiendo si es Urbano o Móvil
+  getCargoSeverity(cargo: string) {
+      if (!cargo) return 'secondary';
+      const c = cargo.toLowerCase();
+      if (c.includes('movil') || c.includes('móvil')) return 'warn'; // <--- Corregido a 'warn'
+      if (c.includes('urbano')) return 'info';
+      return 'secondary';
   }
 }

@@ -7,7 +7,7 @@
 
         <ng-template #end>
             <input type="file" id="fileImport" accept=".csv" style="display: none;" (change)="onFileImport($event)">
-            
+
             <p-button label="Importar CSV" icon="pi pi-download" severity="info" class="mr-2" (onClick)="triggerImport()" [loading]="importando" />
             <p-button label="Exportar" icon="pi pi-upload" severity="secondary" (onClick)="dt.exportCSV()" />
         </ng-template>
@@ -27,22 +27,22 @@
         [showCurrentPageReport]="true"
     >
         <ng-template #caption>
-            <div class="flex items-center justify-between">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <h5 class="m-0 text-xl font-bold">Gestión de Personal Electoral</h5>
                 <p-iconfield>
-                    <p-inputicon styleClass="pi pi-search" />
-                    <input #searchInput pInputText type="text" (input)="dt.filterGlobal(searchInput.value, 'contains')" placeholder="Buscar por cédula, nombre..." class="w-72" />
+                    <p-inputicon styleClass="pi pi-search text-yellow-500" />
+                    <input #searchInput pInputText type="text" (input)="dt.filterGlobal(searchInput.value, 'contains')" placeholder="Buscar por nombre, cédula, cargo..." class="w-full sm:w-96 rounded-xl border-surface-300 dark:border-surface-600 focus:border-yellow-500 transition-colors" />
                 </p-iconfield>
             </div>
         </ng-template>
-        
+
         <ng-template #header>
             <tr>
                 <th style="width: 3rem">Nº</th>
-                <th pSortableColumn="apellidos">Ape. y Nombres <p-sortIcon field="apellidos" /></th>
+                <th pSortableColumn="nombreCompleto" style="min-width: 16rem">Nombres y Apellidos <p-sortIcon field="nombreCompleto" /></th>
                 <th pSortableColumn="cedula">Cédula <p-sortIcon field="cedula" /></th>
                 <th pSortableColumn="cargo">Cargo <p-sortIcon field="cargo" /></th>
-                
+
                 <th>
                     <div class="flex items-center gap-2">
                         Brigada
@@ -64,37 +64,40 @@
                         </p-columnFilter>
                     </div>
                 </th>
-                
+
                 <th>Foto</th>
                 <th pSortableColumn="estado">Estado <p-sortIcon field="estado" /></th>
                 <th>Acciones</th>
             </tr>
         </ng-template>
-        
+
         <ng-template #body let-personal let-rowIndex="rowIndex">
             <tr>
                 <td class="font-bold text-surface-400">{{ rowIndex + 1 }}</td>
-                <td class="font-bold">{{ personal.apellidos }} {{ personal.nombres }}</td>
-                <td><span class="font-mono">{{ personal.cedula }}</span></td>
-                <td class="text-sm">{{ personal.cargo }}</td>
-                
+                <td class="font-bold text-surface-900 dark:text-surface-0">{{ personal.nombreCompleto }}</td>
+                <td><span class="font-mono bg-surface-100 dark:bg-surface-800 px-2 py-1 rounded">{{ personal.cedula }}</span></td>
+
+                <td>
+                    <p-tag [value]="personal.cargo" [severity]="getCargoSeverity(personal.cargo)"></p-tag>
+                </td>
+
                 <td>
                     <span class="font-bold bg-surface-100 dark:bg-surface-800 px-2 py-1 rounded">{{ personal.brigada || '-' }}</span>
                 </td>
-                
+
                 <td>
                     <span class="text-primary font-semibold">{{ personal.coordinador || 'Sin Asignar' }}</span>
                 </td>
 
                 <td>
-                    <img *ngIf="personal.foto_url" [src]="personal.foto_url | safeUrl" [alt]="personal.nombres" referrerpolicy="no-referrer" class="w-10 h-10 rounded-full shadow-md object-cover cursor-pointer hover:scale-110 transition-transform" (click)="viewDetails(personal)" />
+                    <img *ngIf="personal.foto_url" [src]="personal.foto_url | safeUrl" [alt]="personal.nombreCompleto" referrerpolicy="no-referrer" class="w-10 h-10 rounded-full shadow-md object-cover cursor-pointer hover:scale-110 transition-transform" (click)="viewDetails(personal)" />
                     <i *ngIf="!personal.foto_url" class="pi pi-user text-2xl text-surface-400"></i>
                 </td>
-                
+
                 <td>
                     <p-tag [value]="personal.estado" [severity]="getSeverity(personal.estado)" />
                 </td>
-                
+
                 <td>
                     <div class="flex gap-2">
                         <p-button icon="pi pi-eye" severity="info" [rounded]="true" [outlined]="true" pTooltip="Detalles" tooltipPosition="bottom" (onClick)="viewDetails(personal)" />
@@ -104,10 +107,10 @@
                 </td>
             </tr>
         </ng-template>
-        
+
         <ng-template #emptymessage>
             <tr>
-                <td colspan="9">No se encontró personal registrado.</td>
+                <td colspan="9" class="text-center p-6 text-surface-500 font-bold">No se encontró personal registrado con esos datos.</td>
             </tr>
         </ng-template>
     </p-table>
@@ -122,10 +125,10 @@
             <div *ngIf="!selectedPersonal.foto_url" class="w-32 h-32 rounded-full bg-surface-200 flex items-center justify-center mb-4">
                 <i class="pi pi-user text-5xl text-surface-500"></i>
             </div>
-            
-            <h2 class="text-2xl font-bold mb-1">{{ selectedPersonal.nombres }} {{ selectedPersonal.apellidos }}</h2>
+
+            <h2 class="text-2xl font-bold mb-1 text-center">{{ selectedPersonal.nombreCompleto }}</h2>
             <p class="text-surface-500 mb-4 font-mono">{{ selectedPersonal.cedula }}</p>
-            
+
             <div class="grid grid-cols-2 gap-y-4 gap-x-6 w-full mt-4 bg-surface-50 dark:bg-surface-900 p-6 rounded-xl border border-surface-200 dark:border-surface-800">
                 <div>
                     <span class="block text-sm text-surface-500 font-bold mb-1">Cargo / Tipo</span>
@@ -157,19 +160,19 @@
 
     <p-dialog [(visible)]="photoDialog" [style]="{ width: '400px' }" header="Carga Rápida de Fotografía" [modal]="true">
         <div class="flex flex-col items-center mt-2" *ngIf="selectedPersonal">
-            <p class="mb-4 text-center">Seleccione una foto para:<br><strong>{{ selectedPersonal.nombres }} {{ selectedPersonal.apellidos }}</strong></p>
-            
+            <p class="mb-4 text-center">Seleccione una foto para:<br><strong>{{ selectedPersonal.nombreCompleto }}</strong></p>
+
             <div class="w-48 h-48 rounded-xl border border-surface-200 flex items-center justify-center overflow-hidden bg-surface-50 dark:bg-surface-800 mb-6">
                 <img *ngIf="photoPreview" [src]="photoPreview" alt="Preview" class="w-full h-full object-cover"/>
                 <i *ngIf="!photoPreview" class="pi pi-image text-5xl text-surface-300"></i>
             </div>
-            
-            <p-fileupload 
-                mode="basic" 
-                accept="image/*" 
-                [maxFileSize]="5000000" 
-                chooseLabel="Elegir Archivo" 
-                (onSelect)="onQuickPhotoSelect($event)" 
+
+            <p-fileupload
+                mode="basic"
+                accept="image/*"
+                [maxFileSize]="5000000"
+                chooseLabel="Elegir Archivo"
+                (onSelect)="onQuickPhotoSelect($event)"
                 class="mb-4">
             </p-fileupload>
         </div>
