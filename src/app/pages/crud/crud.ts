@@ -182,8 +182,8 @@ interface ExportColumn {
         <p-dialog [(visible)]="fotoDialog" [style]="{ width: '450px' }" header="Subir Foto Oficial" [modal]="true">
             <ng-template #content>
                 <div class="flex flex-col gap-4 items-center p-4">
-                    <p class="text-center font-bold text-xl uppercase">{{personal?.nombres}} {{personal?.apellidos}}</p>
-                    <p class="text-sm font-bold text-yellow-600 mb-2">C.I.: {{personal?.cedula}}</p>
+                    <p class="text-center font-bold text-xl uppercase">{{personal.nombres}} {{personal.apellidos}}</p>
+                    <p class="text-sm font-bold text-yellow-600 mb-2">C.I.: {{personal.cedula}}</p>
                     
                     <div class="w-56 h-56 border-4 border-dashed border-surface-300 dark:border-surface-600 rounded-[2rem] flex items-center justify-center overflow-hidden mb-4 relative hover:border-yellow-400 transition-colors bg-surface-50 dark:bg-surface-900 shadow-inner">
                         <img *ngIf="fotoPreview" [src]="fotoPreview" class="w-full h-full object-cover" />

@@ -33,7 +33,7 @@
             <div
                 class="mx-auto mb-6 border-4 border-yellow-400/40 p-3 pt-4 inline-block rounded-[1.5rem] bg-white dark:bg-surface-800 shadow-md">
                 <h2 class="text-3xl sm:text-4xl font-black text-yellow-500 tracking-tighter leading-none"
-                    style="font-family: 'Verdana', sans-serif;">SERECÍ</h2>
+                    style="font-family: 'Verdana', sans-serif;">SIREPRE</h2>
                 <p
                     class="text-[10px] font-bold text-surface-500 dark:text-surface-400 uppercase tracking-[.3em] mt-1 -mr-[.3em]">
                     Oruro</p>
@@ -41,7 +41,7 @@
             <h1
                 class="text-xl sm:text-2xl font-black text-surface-900 dark:text-surface-0 mb-2 uppercase tracking-tight">
                 Verificación Credencial</h1>
-            <p class="text-surface-500 dark:text-surface-400 font-medium text-sm">Empadronamiento Masivo • OEP Bolivia
+            <p class="text-surface-500 dark:text-surface-400 font-medium text-sm">VERIFICACION DE PERSONAL SIREPRE 2026 PORFAVOR INTRODUZCA EL NUMERO DE SU CI DEL PORTADOR DEL CREDENCIAL
             </p>
         </div>
 
@@ -94,7 +94,7 @@
 
                     <div class="w-40 h-40 sm:w-48 sm:h-48 rounded-[2rem] shadow-xl overflow-hidden bg-surface-100 dark:bg-surface-800 flex items-center justify-center mb-6 relative transition-all duration-500 border-4"
                         [ngClass]="{'border-green-500 shadow-[0_0_25px_rgba(34,197,94,0.4)]': (resultado.estado === 'activo' || resultado.estado === 'ACTIVO'), 'border-surface-200 dark:border-surface-700': (resultado.estado !== 'activo' && resultado.estado !== 'ACTIVO')}">
-                        <img *ngIf="resultado.foto_url" [src]="resultado.foto_url | safeUrl" alt="Foto Oficial"
+                        <img *ngIf="resultado.foto_url" [src]="resultado.foto_url | safeUrl" alt="Foto Oficial" referrerpolicy="no-referrer"
                             class="w-full h-full object-cover" />
                         <i *ngIf="!resultado.foto_url"
                             class="pi pi-user text-7xl text-surface-300 dark:text-surface-600"></i>

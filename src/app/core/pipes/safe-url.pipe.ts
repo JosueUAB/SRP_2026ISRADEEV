@@ -11,14 +11,17 @@ export class SafeUrlPipe implements PipeTransform {
   transform(url: string | null | undefined): SafeUrl | string {
     if (!url) return '';
     
-    // Si es un enlace de Google Drive, lo convertimos a Thumbnail para evitar bloqueos por CORS o Cookies
-    // Ejemplo de URL base: https://drive.google.com/uc?export=view&id=1xCk...
-    let finalUrl = url;
-    if (url.includes('drive.google.com') && url.includes('id=')) {
-      const match = url.match(/id=([^&]+)/);
+    let finalUrl = url.trim();
+
+    // Si es un enlace de Google Drive, lo convertimos a Thumbnail
+    if (finalUrl.includes('drive.google.com') && finalUrl.includes('id=')) {
+      const match = finalUrl.match(/id=([^&]+)/);
       if (match && match[1]) {
          finalUrl = `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
       }
+    } else if (!finalUrl.startsWith('http') && !finalUrl.startsWith('data:image')) {
+      // Si no es URL ni data URI, asumimos que es base64 en crudo (legacy)
+      finalUrl = `data:image/jpeg;base64,${finalUrl}`;
     }
 
     // Bypass del sanitizer de Angular

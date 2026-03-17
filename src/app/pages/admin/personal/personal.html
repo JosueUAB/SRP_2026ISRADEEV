@@ -87,7 +87,7 @@
                 </td>
 
                 <td>
-                    <img *ngIf="personal.foto_url" [src]="personal.foto_url | safeUrl" [alt]="personal.nombres" class="w-10 h-10 rounded-full shadow-md object-cover cursor-pointer hover:scale-110 transition-transform" (click)="viewDetails(personal)" />
+                    <img *ngIf="personal.foto_url" [src]="personal.foto_url | safeUrl" [alt]="personal.nombres" referrerpolicy="no-referrer" class="w-10 h-10 rounded-full shadow-md object-cover cursor-pointer hover:scale-110 transition-transform" (click)="viewDetails(personal)" />
                     <i *ngIf="!personal.foto_url" class="pi pi-user text-2xl text-surface-400"></i>
                 </td>
                 
@@ -118,7 +118,7 @@
 
     <p-dialog [(visible)]="detailsDialog" [style]="{ width: '500px' }" header="Detalles del Operador" [modal]="true" *ngIf="selectedPersonal">
         <div class="flex flex-col items-center p-4">
-            <img *ngIf="selectedPersonal.foto_url" [src]="selectedPersonal.foto_url | safeUrl" class="w-32 h-32 rounded-full shadow-lg object-cover mb-4 border-4 border-surface-200" />
+            <img *ngIf="selectedPersonal.foto_url" [src]="selectedPersonal.foto_url | safeUrl" referrerpolicy="no-referrer" class="w-32 h-32 rounded-full shadow-lg object-cover mb-4 border-4 border-surface-200" />
             <div *ngIf="!selectedPersonal.foto_url" class="w-32 h-32 rounded-full bg-surface-200 flex items-center justify-center mb-4">
                 <i class="pi pi-user text-5xl text-surface-500"></i>
             </div>
