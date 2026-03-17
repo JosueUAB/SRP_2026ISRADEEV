@@ -1,13 +1,13 @@
-import { Component, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { ToastModule } from 'primeng/toast'; // <-- NUEVO
-import { ProgressBarModule } from 'primeng/progressbar'; // <-- NUEVO
-import { ProgressSpinnerModule } from 'primeng/progressspinner'; // <-- NUEVO
-import { TooltipModule } from 'primeng/tooltip'; // <-- NUEVO
-import { MessageService } from 'primeng/api'; // <-- NUEVO
+import { ToastModule } from 'primeng/toast';
+import { ProgressBarModule } from 'primeng/progressbar';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { TooltipModule } from 'primeng/tooltip';
+import { MessageService } from 'primeng/api';
 import { RouterModule } from '@angular/router';
 import { AppFloatingConfigurator } from '../../layout/component/app.floatingconfigurator';
 import { Api } from '../../core/services/api';
@@ -17,38 +17,63 @@ import { SafeUrlPipe } from '../../core/pipes/safe-url.pipe';
   selector: 'app-public-search',
   standalone: true,
   imports: [
-    CommonModule, FormsModule, ButtonModule, InputTextModule, 
-    ToastModule, ProgressBarModule, ProgressSpinnerModule, TooltipModule, // <-- AGREGADOS
+    CommonModule, FormsModule, ButtonModule, InputTextModule,
+    ToastModule, ProgressBarModule, ProgressSpinnerModule, TooltipModule,
     RouterModule, AppFloatingConfigurator, SafeUrlPipe
   ],
-  providers: [MessageService], // <-- PROVEEDOR PARA EL TOAST
+  providers: [MessageService],
   templateUrl: './public-search.html',
   styleUrl: './public-search.scss',
 })
 export class PublicSearch {
   private api = inject(Api);
   private cdr = inject(ChangeDetectorRef);
-  private messageService = inject(MessageService); // <-- INYECTAR SERVICIO
+  private messageService = inject(MessageService);
 
   searchQuery: string = '';
   loading: boolean = false;
-  buscando: boolean = false; // <-- Para la Progress Bar de arriba
+  buscando: boolean = false;
   resultado: any = null;
   vistaActual: 'buscador' | 'credencial' = 'buscador';
 
+  // ==========================================
+  // MEDIDAS ANTI-FRAUDE (Dificulta la edición)
+  // ==========================================
+
+  // 1. Bloquear Clic Derecho
+  @HostListener('document:contextmenu', ['$event'])
+  onRightClick(event: MouseEvent) {
+    event.preventDefault();
+  }
+
+  // 2. Bloquear F12, Ctrl+Shift+I, Ctrl+U (Ver código fuente)
+  @HostListener('document:keydown', ['$event'])
+  onKeyDown(event: KeyboardEvent) {
+    if (
+      event.key === 'F12' ||
+      (event.ctrlKey && event.shiftKey && event.key === 'I') ||
+      (event.ctrlKey && event.shiftKey && event.key === 'J') ||
+      (event.ctrlKey && event.key === 'U') ||
+      (event.ctrlKey && event.key === 'S')
+    ) {
+      event.preventDefault();
+      this.messageService.add({ severity: 'warn', summary: 'Acción no permitida', detail: 'Por motivos de seguridad, esta acción está deshabilitada.', life: 3000 });
+    }
+  }
+
+  // ==========================================
+
   buscar(query: string) {
     if (!query || query.trim().length === 0) {
-      // Usamos TOAST en lugar de SweetAlert
       this.messageService.add({ severity: 'warn', summary: 'Atención', detail: 'Por favor, ingrese un número de cédula válido.', life: 3000 });
       return;
     }
 
     this.loading = true;
-    this.buscando = true; // Activa Progress Bar infinita
+    this.buscando = true;
 
     this.api.buscarPorCedula(query.trim()).subscribe({
       next: (response) => {
-        // Parse if GAS returned text instead of application/json
         let res = response;
         if (typeof response === 'string') {
           try { res = JSON.parse(response); } catch(e) {}
@@ -56,15 +81,13 @@ export class PublicSearch {
 
         if (res && res.status === 'success' && res.data && res.data.length > 0) {
           this.resultado = res.data[0];
-          this.vistaActual = 'credencial'; 
+          this.vistaActual = 'credencial';
         } else {
-          // Toast de "No encontrado"
           this.messageService.add({ severity: 'info', summary: 'No encontrado', detail: `No hay registros activos para la cédula ${query}`, life: 4000 });
         }
         this.finalizarBusqueda();
       },
       error: (err) => {
-        // Toast de Error
         this.messageService.add({ severity: 'error', summary: 'Error de Conexión', detail: 'Problema al conectar con el servidor. Inténtelo más tarde.', life: 5000 });
         this.finalizarBusqueda();
       }
@@ -73,7 +96,7 @@ export class PublicSearch {
 
   private finalizarBusqueda() {
     this.loading = false;
-    this.buscando = false; // Desactiva Progress Bar
+    this.buscando = false;
     this.cdr.markForCheck();
   }
 
